@@ -1,0 +1,71 @@
+# Secure Inter-Campus Communication Network - six-node isolated lab.
+# All three networks are internal and have masquerading disabled: no lab traffic leaves the host.
+name: scp-g${GROUP_ID}
+
+x-node: &node
+  build: ./docker
+  image: scp-lab:g${GROUP_ID}
+  volumes: ["..:/work"]
+  working_dir: /work
+  cap_add: [NET_ADMIN]
+  command: ["/work/lab/roles/entrypoint.sh"]
+  restart: unless-stopped
+
+x-env: &env
+  GROUP_ID: ${GROUP_ID}
+  GROUP_NUM: ${GROUP_NUM}
+
+networks:
+  wan:      # untrusted WAN 172.16.G.0/24
+    internal: true
+    driver_opts: {com.docker.network.bridge.enable_ip_masquerade: "false"}
+    ipam: {config: [{subnet: "172.16.${GROUP_NUM}.0/24", gateway: "172.16.${GROUP_NUM}.254"}]}
+  hq:       # HQ LAN 10.G.1.0/24
+    internal: true
+    driver_opts: {com.docker.network.bridge.enable_ip_masquerade: "false"}
+    ipam: {config: [{subnet: "10.${GROUP_NUM}.1.0/24", gateway: "10.${GROUP_NUM}.1.254"}]}
+  branch:   # Branch LAN 10.G.2.0/24
+    internal: true
+    driver_opts: {com.docker.network.bridge.enable_ip_masquerade: "false"}
+    ipam: {config: [{subnet: "10.${GROUP_NUM}.2.0/24", gateway: "10.${GROUP_NUM}.2.254"}]}
+
+services:
+  gw-hq:
+    <<: *node
+    hostname: gw-hq
+    environment: {<<: *env, ROLE: gw-hq}
+    cap_add: [NET_ADMIN, NET_RAW]
+    sysctls: {net.ipv4.ip_forward: "1"}
+    networks:
+      wan: {ipv4_address: "172.16.${GROUP_NUM}.10"}
+      hq:  {ipv4_address: "10.${GROUP_NUM}.1.1"}
+  gw-branch:
+    <<: *node
+    hostname: gw-branch
+    environment: {<<: *env, ROLE: gw-branch}
+    cap_add: [NET_ADMIN, NET_RAW]
+    sysctls: {net.ipv4.ip_forward: "1"}
+    networks:
+      wan:    {ipv4_address: "172.16.${GROUP_NUM}.20"}
+      branch: {ipv4_address: "10.${GROUP_NUM}.2.1"}
+  web-hq:
+    <<: *node
+    hostname: web-hq
+    environment: {<<: *env, ROLE: web-hq}
+    networks: {hq: {ipv4_address: "10.${GROUP_NUM}.1.10"}}
+  kdc:
+    <<: *node
+    hostname: kdc
+    environment: {<<: *env, ROLE: kdc}
+    networks: {hq: {ipv4_address: "10.${GROUP_NUM}.1.20"}}
+  client-br:
+    <<: *node
+    hostname: client-br
+    environment: {<<: *env, ROLE: client-br}
+    networks: {branch: {ipv4_address: "10.${GROUP_NUM}.2.10"}}
+  attacker:
+    <<: *node
+    hostname: attacker
+    environment: {<<: *env, ROLE: attacker}
+    cap_add: [NET_ADMIN, NET_RAW]
+    networks: {wan: {ipv4_address: "172.16.${GROUP_NUM}.66"}}

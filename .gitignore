@@ -1,0 +1,19 @@
+# --- secrets: NEVER commit ---
+.env
+*.key
+*.p12
+*.pfx
+*.srl
+*keylog*
+sslkeylog*
+**/private/
+pki/out/
+pki/.passphrase*
+*.passphrase
+*.psk
+# --- noise ---
+__pycache__/
+*.pyc
+.venv/
+.vscode/
+.DS_Store

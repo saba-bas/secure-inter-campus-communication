@@ -1,0 +1,24 @@
+WAN interface of gw-hq: eth1
+tcpdump: listening on eth1, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+PING 10.7.1.10 (10.7.1.10) 56(84) bytes of data.
+64 bytes from 10.7.1.10: icmp_seq=1 ttl=62 time=1.53 ms
+64 bytes from 10.7.1.10: icmp_seq=2 ttl=62 time=0.090 ms
+64 bytes from 10.7.1.10: icmp_seq=3 ttl=62 time=0.085 ms
+
+--- 10.7.1.10 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2012ms
+rtt min/avg/max/mdev = 0.085/0.566/1.525/0.677 ms
+<html><body><h1>ABU Campus Portal - BASELINE (plain HTTP)</h1>
+<p>Known plaintext marker: SCP-BASELINE-KNOWN-PLAINTEXT</p>
+<form method="post" action="/login"><input name="user"><input name="password"></form></body></html>
+19 packets captured
+22 packets received by filter
+0 packets dropped by kernel
+
+--- HTTP requests found in the capture ---
+10.7.2.10	10.7.1.10	http://10.7.1.10/
+
+--- Known plaintext marker found in the capture ---
+14	10.7.1.10	10.7.2.10
+
+Baseline capture verification completed.
