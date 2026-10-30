@@ -177,6 +177,8 @@ def stride_xlsx():
 
 def teamplan():
     s = cover("M1 - Team Work Plan", "Responsibilities, schedule, Git workflow and release plan")
+    if len(MEMBERS) == 1:
+        return teamplan_solo()
     m1, m2, m3 = MEMBERS
     s += [H1("1. Team and primary responsibilities"),
           P("Every member owns one stream but must understand and be able to explain all of them (the Week-14 discussion asks each member about any part). Every merge request is reviewed by another member."),
@@ -222,6 +224,57 @@ def teamplan():
             [6.2, 3.2, 8.0]),
           H1("7. Communication"),
           P("Two short team meetings per week (decisions written in docs/ as short notes), a shared task list in GitHub Issues, and a 30-minute weekly cross-explanation session in which each member presents one component to the others.")]
+    build(f"{OUT}/M1_TeamPlan.pdf", s, "M1 Team Plan")
+
+
+def teamplan_solo():
+    m = MEMBERS[0]
+    s = cover("M1 - Team Work Plan", "Individual project: responsibilities, schedule, Git workflow and release plan")
+    s += [H1("1. Team composition"),
+          P(f"Group {GID} has a single member: <b>{m}</b>. The specification asks for groups of three; this one-person group is an exception that needs the instructor's approval "
+            "(approval reference: to be added here). The same scope and deliverables apply, so the single member owns every stream and must be able to explain all of them."),
+          T([["Stream", "Owner", "Milestone"],
+             ["Docker lab, baseline/WAN captures, gateway firewall, strongSwan IKEv2, fail-closed proof (T7-T10)", m, "M1, M3"],
+             ["PKI scripts, certificate profiles, CRL, nginx TLS + mutual TLS, TLS assessment, MITM/downgrade attacks (T1, T3-T6)", m, "M2, M3, M4"],
+             ["Crypto tool + test vectors (T2), KDC/client/service, weak variant, replay attack and fix (T11-T12), secret scan (T13)", m, "M2, M3, M4"],
+             ["Tests, evidence, final report, README rebuild", m, "M4"]],
+            [11.2, 3.6, 2.6]),
+          H1("2. Deliverable ownership for M1"),
+          T([["Deliverable", "Author", "Quality check", "Status"],
+             ["M1_Requirements.pdf", m, "self-review checklist (FR/SR coverage)", "done"],
+             ["M1_Topology_Trust.pdf", m, "addresses checked against the running lab", "done"],
+             ["M1_PKI_Design.pdf", m, "profiles checked against spec section 6", "done"],
+             ["M1_ProtocolDesign.pdf", m, "sequence diagrams vs RFC 8446 / 7296 / 4120", "done"],
+             ["M1_STRIDE.xlsx", m, "18 threats tied to lab assets", "done"],
+             ["Baseline pcap + output log", m, "frame containing the plaintext marker found with tshark", "done"],
+             ["Repository + tag M1", m, "secret check before tag", "to do"]],
+            [5.6, 2.6, 7.0, 2.2]),
+          H1("3. Schedule"),
+          T([["Period", "Milestone", "Main tasks", "Output"],
+             ["29/10 - 06/11", "M1 (4 marks)", "Lab up, baseline capture, six design documents, STRIDE, repository with tag M1", "Tag M1"],
+             ["07/11 - 20/11", "M2 (6 marks)", "week 1: openssl configs + build_pki.sh, issue/revoke, scpcrypt.py with RFC 4231/8032 vectors; week 2: nginx TLS/mTLS, CRL, functional tests, README", "Tag M2"],
+             ["21/11 - 11/12", "M3 (11 marks)", "Midterm exam week 29/11-05/12: no milestone due, reduced load. Before: gateway certs + swanctl + firewall; after: KDC/client/service, weak variant, attacks, tests T1-T10, before/after captures", "Tag M3"],
+             ["12/12 - 25/12", "M4 (9 marks)", "Revocation + rotation demo, testssl before/after, T1-T13 via run_all.sh, final report, secret scan, clean rebuild, tag FINAL", "Tag FINAL"],
+             ["10/01 - 14/01/2027", "Week 14", "Discussion on FINAL: 10 min live tests + individual questions", "-"]],
+            [2.6, 2.4, 9.6, 2.8]),
+          P("Because the workload of three people falls on one, priority order if time is short: (1) PKI + TLS (M2), (2) IPsec tunnel with fail-closed proof, (3) Kerberos-style protocol and replay test, (4) extras. Each milestone is finished 24 hours early for the secret scan and a fresh-clone test; no late days are planned."),
+          H1("4. Git workflow and release plan"),
+          *B(["Private GitHub repository with the folder structure of the specification. Branch <b>main</b> always works; short <b>feature/&lt;area&gt;</b> branches for bigger tasks; commit messages 'area: what'.",
+              "Tags: <b>M1</b> (06/11), <b>M2</b> (20/11), <b>M3</b> (11/12), <b>FINAL</b> (25/12, before the end of the day): git tag -a M1 -m 'Milestone 1'; git push origin M1.",
+              "Before every tag: secret scan of the full history and git status check (no .env, *.key, *.p12, key-log files).",
+              "Without a second reviewer, every merge is checked against the definition of done below and against the acceptance test that covers it."]),
+          H1("5. Definition of done (every task)"),
+          *B(["Script or configuration committed and runs on the lab from the README steps; linked to its T-number.",
+              "Evidence stored in evidence/ with the command, capture filter or packet numbers - never screenshots alone.",
+              "No secret in the diff."]),
+          H1("6. Project risks"),
+          T([["Risk", "Impact", "Mitigation"],
+             ["One person does the work planned for three", "Missed milestones", "Strict priority order, work started early, instructor approval for the exception"],
+             ["strongSwan/Docker problems (capabilities, charon without systemd)", "Delays M3", "Test a minimal tunnel early in the M2 period"],
+             ["Midterm exam week reduces working time", "M3 slips", "Finish PKI and gateway certificates before 29/11"],
+             ["Secrets committed by accident", "Mark loss, SR11", ".gitignore, scan before each tag"],
+             ["Copying another group's numbers", "Treated as copied work", f"All names/addresses derive from G={G} and GROUP_ID={GID} only"]],
+            [6.2, 3.2, 8.0])]
     build(f"{OUT}/M1_TeamPlan.pdf", s, "M1 Team Plan")
 
 

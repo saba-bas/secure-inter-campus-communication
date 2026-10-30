@@ -16,9 +16,9 @@ G = int(os.environ.get("GROUP_NUM", "7"))
 GID = os.environ.get("GROUP_ID", f"{G:02d}")
 D = f"g{GID}.scp.lab"
 WAN, HQ, BR = f"172.16.{G}", f"10.{G}.1", f"10.{G}.2"
-MEMBERS = [os.environ.get("M1_NAME", "Member 1 (name / ID)"),
-           os.environ.get("M2_NAME", "Member 2 (name / ID)"),
-           os.environ.get("M3_NAME", "Member 3 (name / ID)")]
+MEMBERS = [n for n in (os.environ.get("M1_NAME", "Member 1 (name / ID)"),
+                       os.environ.get("M2_NAME", "Member 2 (name / ID)"),
+                       os.environ.get("M3_NAME", "Member 3 (name / ID)")) if n and n != "-"]
 COURSE = "Secure Communication Protocols (1305301) - First Semester 2026/2027"
 NAVY = colors.HexColor("#14304a")
 LIGHT = colors.HexColor("#e6eef4")

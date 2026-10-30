@@ -33,7 +33,7 @@ This writes `evidence/pcaps/M1_baseline_wan.pcap` (tcpdump on gw-hq WAN interfac
 ## 3. Regenerate the documents with your own names
 ```bash
 cd docs/tools
-GROUP_NUM=7 GROUP_ID=07 M1_NAME="..." M2_NAME="..." M3_NAME="..." ./make_docs.sh
+GROUP_NUM=7 GROUP_ID=07 M1_NAME="Name (ID)" M2_NAME="-" M3_NAME="-" ./make_docs.sh
 ```
 
 ## 4. Ports used by the lab
